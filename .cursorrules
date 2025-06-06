@@ -1,0 +1,91 @@
+# Rails Project Cursor Rules
+
+## Code Style & Formatting
+- Use 2 spaces for indentation (Ruby standard)
+- Follow Ruby style guide conventions(Rubocop)
+
+## Rails Conventions
+- Follow Rails naming conventions strictly
+- Use RESTful routes and controller actions
+- Keep controllers thin, models fat
+- Use before_action callbacks for common controller logic
+- Prefer ActiveRecord associations over manual queries
+
+## Database & Models
+- Always add database constraints for data integrity
+- Use proper ActiveRecord validations
+- Add database indexes for frequently queried columns
+- Use meaningful migration names with timestamps
+- Keep model methods focused and single-purpose
+
+## Testing
+- Write tests for all new features and bug fixes
+- Use RSpec as the testing framework
+- Follow the AAA pattern (Arrange, Act, Assert)
+- Use FactoryBot for test data creation
+- Mock external API calls in tests
+- Aim for high test coverage but focus on meaningful tests
+- Write request specs for API endpoints
+- run the tests before finalizing the task
+- run rubocop autocorrect after the code is finalized
+
+
+## Security
+- Always use strong parameters in controllers
+- Validate and sanitize user input
+- Follow Rails security best practices
+- Never commit sensitive data like API keys
+- Use Rails credentials or environment variables for secrets
+- Implement proper authorization checks
+
+## Performance
+- Use database indexes appropriately
+- Avoid N+1 queries - use includes/joins
+- Use fragment caching where beneficial
+- Optimize database queries before adding caching
+- Use background jobs for long-running tasks
+- Profile and benchmark performance-critical code
+
+## Code Organization
+- Keep methods under 10 lines when possible
+- Extract complex logic into service objects or concerns
+- Use modules for shared functionality
+- Group related methods together
+- Add comments for complex business logic only
+- Use meaningful variable and method names
+
+## Gems & Dependencies
+- Keep Gemfile organized with comments
+- Pin gem versions in production
+- Regular gem updates with testing
+- Prefer well-maintained gems with good documentation
+- Use Bundler properly with Gemfile.lock
+
+## Error Handling
+- Use Rails error handling patterns
+- Log errors appropriately
+- Provide meaningful error messages to users
+- Handle edge cases gracefully
+- Use rescue blocks judiciously
+
+## API Development
+- Follow RESTful API conventions
+- Use proper HTTP status codes
+- Implement consistent JSON response formats
+- Add API versioning from the start
+- Include proper error responses
+- Use serializers for JSON responses
+
+## Git & Workflow
+- Write descriptive commit messages
+- Use feature branches for development
+- Keep commits focused and atomic
+- Squash related commits before merging
+- Update CHANGELOG.md for significant changes
+
+## Documentation
+- Update README.md with setup instructions
+- Document complex business logic
+- Add inline comments for non-obvious code
+- Keep API documentation current
+- Document deployment procedures
