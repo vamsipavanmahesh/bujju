@@ -14,7 +14,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      post 'auth/google', to: 'auth#google_sign_in'
+      post "auth/google", to: "auth#google_sign_in"
     end
   end
 end

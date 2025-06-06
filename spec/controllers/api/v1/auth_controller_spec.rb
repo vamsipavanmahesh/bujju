@@ -18,7 +18,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
     # Set up environment variables
     ENV['GOOGLE_CLIENT_ID'] = 'test_google_client_id'
     ENV['JWT_SECRET_KEY'] = 'test_jwt_secret_key'
-    
+
     # Mock the GoogleIDToken::Validator
     allow(GoogleIDToken::Validator).to receive(:new).and_return(google_validator)
   end
@@ -41,11 +41,11 @@ RSpec.describe Api::V1::AuthController, type: :controller do
         post :google_sign_in, params: { auth: { id_token: 'valid_token' } }
 
         expect(response).to have_http_status(:ok)
-        
+
         json_response = JSON.parse(response.body)
         expect(json_response).to have_key('token')
         expect(json_response).to have_key('user')
-        
+
         user_data = json_response['user']
         expect(user_data['email']).to eq('user@example.com')
         expect(user_data['name']).to eq('Test User')
@@ -79,7 +79,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
       it 'logs successful authentication' do
         allow(Rails.logger).to receive(:info) # Allow other info messages
         expect(Rails.logger).to receive(:info).with(/Successful Google sign in for user/)
-        
+
         post :google_sign_in, params: { auth: { id_token: 'valid_token' } }
       end
     end
@@ -121,7 +121,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
 
       it 'logs the configuration error' do
         expect(Rails.logger).to receive(:error).with('Google Client ID not configured')
-        
+
         post :google_sign_in, params: { auth: { id_token: 'valid_token' } }
       end
     end
@@ -142,7 +142,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
           .and_raise(GoogleIDToken::ValidationError.new('Invalid token'))
 
         expect(Rails.logger).to receive(:error).with(/Google token validation failed/)
-        
+
         post :google_sign_in, params: { auth: { id_token: 'invalid_token' } }
       end
     end
@@ -193,7 +193,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
         allow(google_validator).to receive(:check).and_return(invalid_payload)
 
         expect(Rails.logger).to receive(:error).with(/Invalid Google token payload/)
-        
+
         post :google_sign_in, params: { auth: { id_token: 'valid_token' } }
       end
 
@@ -202,7 +202,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
         allow(google_validator).to receive(:check).and_return(invalid_payload)
 
         expect(Rails.logger).to receive(:warn).with(/Unverified email attempted sign in/)
-        
+
         post :google_sign_in, params: { auth: { id_token: 'valid_token' } }
       end
     end
@@ -241,7 +241,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
         )
 
         expect(Rails.logger).to receive(:error).with(/User creation\/update failed/)
-        
+
         post :google_sign_in, params: { auth: { id_token: 'valid_token' } }
       end
     end
@@ -264,7 +264,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
         allow(controller).to receive(:generate_jwt_token).and_raise(JWT::EncodeError.new('Invalid secret'))
 
         expect(Rails.logger).to receive(:error).with(/JWT encoding failed/)
-        
+
         post :google_sign_in, params: { auth: { id_token: 'valid_token' } }
       end
     end
@@ -284,7 +284,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
 
         expect(Rails.logger).to receive(:error).with(/Unexpected error during Google sign in/)
         expect(Rails.logger).to receive(:error).with(anything) # backtrace
-        
+
         post :google_sign_in, params: { auth: { id_token: 'valid_token' } }
       end
     end
@@ -328,7 +328,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
           exp: 1.hour.ago.to_i,
           iat: 2.hours.ago.to_i
         }
-        
+
         # Create token that will be expired when JWT tries to decode it
         # We need to bypass JWT's automatic expiration checking by using a different approach
         allow(JWT).to receive(:decode).and_call_original
@@ -367,7 +367,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
 
       it 'logs token verification errors' do
         allow(JWT).to receive(:decode).and_raise(StandardError.new('Unexpected error'))
-        
+
         expect(Rails.logger).to receive(:error).with(/Token verification failed/)
 
         controller.verify_jwt_token(valid_token)
@@ -379,15 +379,15 @@ RSpec.describe Api::V1::AuthController, type: :controller do
         # Test the manual expiration check by directly testing the controller logic
         # Create a valid user and mock the JWT decode to return an expired payload
         test_user = create(:user)
-        
+
         # Stub the JWT.decode method to return an expired payload
         expired_payload = {
           'user_id' => test_user.id,
           'exp' => 1.hour.ago.to_i,
           'iat' => 2.hours.ago.to_i
         }
-        
-        allow(JWT).to receive(:decode).and_return([expired_payload, {}])
+
+        allow(JWT).to receive(:decode).and_return([ expired_payload, {} ])
 
         result = controller.verify_jwt_token('any_token')
 
@@ -404,7 +404,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
         token = controller.send(:generate_jwt_token, user)
 
         expect(token).to be_present
-        
+
         # Decode and verify token structure
         decoded = JWT.decode(token, ENV['JWT_SECRET_KEY'], true, { algorithm: 'HS256' })
         payload = decoded.first
@@ -436,7 +436,7 @@ RSpec.describe Api::V1::AuthController, type: :controller do
 
       it 'raises ArgumentError for unpersisted user' do
         unpersisted_user = build(:user)
-        
+
         expect {
           controller.send(:generate_jwt_token, unpersisted_user)
         }.to raise_error(ArgumentError, 'Invalid user object for token generation')
@@ -445,11 +445,11 @@ RSpec.describe Api::V1::AuthController, type: :controller do
       it 'raises ArgumentError for user without id' do
         user_without_id = create(:user)
         allow(user_without_id).to receive(:id).and_return(nil)
-        
+
         expect {
           controller.send(:generate_jwt_token, user_without_id)
         }.to raise_error(ArgumentError, 'Invalid user object for token generation')
       end
     end
   end
-end 
+end

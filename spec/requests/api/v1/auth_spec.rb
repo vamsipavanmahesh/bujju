@@ -17,7 +17,7 @@ RSpec.describe 'Api::V1::Auth', type: :request do
     # Set up environment variables
     ENV['GOOGLE_CLIENT_ID'] = 'test_google_client_id'
     ENV['JWT_SECRET_KEY'] = 'test_jwt_secret_key'
-    
+
     # Mock the GoogleIDToken::Validator
     allow(GoogleIDToken::Validator).to receive(:new).and_return(google_validator)
   end
@@ -45,20 +45,20 @@ RSpec.describe 'Api::V1::Auth', type: :request do
         expect(response.content_type).to include('application/json')
 
         json_response = JSON.parse(response.body)
-        
+
         # Verify response structure
         expect(json_response).to have_key('token')
         expect(json_response).to have_key('user')
-        
+
         # Verify JWT token is valid
         token = json_response['token']
         expect(token).to be_present
-        
+
         decoded = JWT.decode(token, ENV['JWT_SECRET_KEY'], true, { algorithm: 'HS256' })
         payload = decoded.first
         expect(payload['user_id']).to be_present
         expect(payload['email']).to eq('user@example.com')
-        
+
         # Verify user data
         user_data = json_response['user']
         expect(user_data['id']).to be_present
@@ -131,8 +131,6 @@ RSpec.describe 'Api::V1::Auth', type: :request do
         expect(response).to have_http_status(:bad_request)
         expect(JSON.parse(response.body)['error']).to eq('Missing auth parameter')
       end
-
-
     end
 
     context 'with invalid Google token' do
@@ -206,7 +204,7 @@ RSpec.describe 'Api::V1::Auth', type: :request do
         invalid_user = User.new
         invalid_user.errors.add(:email, 'is invalid')
         invalid_user.errors.add(:name, 'is too short')
-        
+
         allow(User).to receive(:from_google_token!).and_raise(
           ActiveRecord::RecordInvalid.new(invalid_user)
         )
@@ -236,7 +234,7 @@ RSpec.describe 'Api::V1::Auth', type: :request do
       it 'handles JSON request body' do
         allow(google_validator).to receive(:check).and_return(valid_google_payload)
 
-        post url, 
+        post url,
              params: { auth: { id_token: 'valid_token' } }.to_json,
              headers: { 'Content-Type' => 'application/json' }
 
@@ -247,7 +245,7 @@ RSpec.describe 'Api::V1::Auth', type: :request do
       it 'handles form data request' do
         allow(google_validator).to receive(:check).and_return(valid_google_payload)
 
-        post url, 
+        post url,
              params: { auth: { id_token: 'valid_token' } },
              headers: { 'Content-Type' => 'application/x-www-form-urlencoded' }
 
@@ -290,7 +288,7 @@ RSpec.describe 'Api::V1::Auth', type: :request do
 
       # Step 1: Sign in with Google
       post '/api/v1/auth/google', params: { auth: { id_token: 'google_id_token' } }
-      
+
       expect(response).to have_http_status(:ok)
       auth_response = JSON.parse(response.body)
       jwt_token = auth_response['token']
@@ -299,7 +297,7 @@ RSpec.describe 'Api::V1::Auth', type: :request do
       # Step 2: Verify the JWT token can be used for authentication
       controller = Api::V1::AuthController.new
       verification_result = controller.verify_jwt_token(jwt_token)
-      
+
       expect(verification_result[:error]).to be_nil
       expect(verification_result[:user].id).to eq(user_id)
       expect(verification_result[:user].email).to eq('user@example.com')
@@ -312,4 +310,4 @@ RSpec.describe 'Api::V1::Auth', type: :request do
       expect(user.provider_id).to eq('12345')
     end
   end
-end 
+end

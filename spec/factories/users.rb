@@ -6,4 +6,4 @@ FactoryBot.define do
     provider { 'google' }
     provider_id { Faker::Internet.unique.uuid }
   end
-end 
+end
