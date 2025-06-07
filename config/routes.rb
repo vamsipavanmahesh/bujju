@@ -18,6 +18,12 @@ Rails.application.routes.draw do
 
       # Connections CRUD - only the routes we need
       resources :connections, only: [ :index, :show, :create, :update, :destroy ]
+
+      # User preferences - only show and update
+      resource :user_preferences, only: [ :show, :update ]
+
+      # Onboarding settings - only show
+      resource :onboarding, only: [ :show ]
     end
   end
 end

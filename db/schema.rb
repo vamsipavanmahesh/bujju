@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_07_050550) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_07_092716) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_07_050550) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_connections_on_user_id"
+  end
+
+  create_table "onboarding", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.datetime "notification_time_setting"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_onboarding_on_user_id", unique: true
+  end
+
+  create_table "user_preferences", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.time "notification_time"
+    t.string "timezone", limit: 50
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_preferences_on_user_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|
@@ -37,4 +54,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_07_050550) do
   end
 
   add_foreign_key "connections", "users"
+  add_foreign_key "onboarding", "users"
+  add_foreign_key "user_preferences", "users"
 end

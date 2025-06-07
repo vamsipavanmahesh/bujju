@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   # Associations
   has_many :connections, dependent: :destroy
+  has_one :user_preference, dependent: :destroy
+  has_one :onboarding, dependent: :destroy
 
   # Validations
   validates :email, presence: true, uniqueness: true
