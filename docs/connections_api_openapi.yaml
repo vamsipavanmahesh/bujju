@@ -1,0 +1,375 @@
+openapi: 3.0.3
+info:
+  title: Connections Management API
+  description: API for managing user connections with JWT authentication
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@yourapp.com
+
+servers:
+  - url: https://yourapp.com/api/v1
+    description: Production server
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/google:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate with Google OAuth
+      description: Exchange Google OAuth token for JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auth:
+                  type: object
+                  properties:
+                    id_token:
+                      type: string
+                      description: Google OAuth ID token
+              required:
+                - auth
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token for API access
+                  user:
+                    $ref: '#/components/schemas/User'
+
+  /connections:
+    get:
+      tags:
+        - Connections
+      summary: List all connections
+      description: Get all connections for the authenticated user
+      responses:
+        '200':
+          description: List of connections
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Connection'
+
+    post:
+      tags:
+        - Connections
+      summary: Create a new connection
+      description: Add a new connection to the user's list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                connection:
+                  $ref: '#/components/schemas/ConnectionInput'
+              required:
+                - connection
+      responses:
+        '201':
+          description: Connection created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Connection'
+                  message:
+                    type: string
+                    example: "Connection created successfully"
+        '422':
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /connections/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Connection ID
+
+    get:
+      tags:
+        - Connections
+      summary: Get a specific connection
+      description: Retrieve details of a specific connection
+      responses:
+        '200':
+          description: Connection details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Connection'
+        '404':
+          description: Connection not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+    put:
+      tags:
+        - Connections
+      summary: Update connection (PUT)
+      description: Update connection information using PUT method
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                connection:
+                  $ref: '#/components/schemas/ConnectionInput'
+              required:
+                - connection
+      responses:
+        '200':
+          description: Connection updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Connection'
+                  message:
+                    type: string
+                    example: "Connection updated successfully"
+        '404':
+          description: Connection not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '422':
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    patch:
+      tags:
+        - Connections
+      summary: Update connection (PATCH)
+      description: Partially update connection information using PATCH method
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                connection:
+                  $ref: '#/components/schemas/ConnectionInput'
+              required:
+                - connection
+      responses:
+        '200':
+          description: Connection updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Connection'
+                  message:
+                    type: string
+                    example: "Connection updated successfully"
+        '404':
+          description: Connection not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+        '422':
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    delete:
+      tags:
+        - Connections
+      summary: Delete connection
+      description: Remove a connection from the user's list
+      responses:
+        '200':
+          description: Connection deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Connection deleted successfully"
+        '404':
+          description: Connection not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Connection:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "John Doe"
+        phone_number:
+          type: string
+          example: "+1234567890"
+        relationship:
+          type: string
+          enum: [friend, family, colleague, partner, parent, child, sibling, romantic_interest]
+          example: "colleague"
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00.000Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-12-01T10:00:00.000Z"
+
+    ConnectionInput:
+      type: object
+      required:
+        - name
+        - phone_number
+        - relationship
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          example: "John Doe"
+          description: "Name of the connection"
+        phone_number:
+          type: string
+          example: "+1234567890"
+          description: "Phone number in any format"
+        relationship:
+          type: string
+          enum: [friend, family, colleague, partner, parent, child, sibling, romantic_interest]
+          example: "colleague"
+          description: "Type of relationship with this connection"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: "user@example.com"
+        name:
+          type: string
+          example: "John Doe"
+        avatar_url:
+          type: string
+          format: uri
+          example: "https://example.com/avatar.jpg"
+
+    ValidationError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        errors:
+          type: array
+          items:
+            type: string
+          example: ["Name can't be blank", "Phone number can't be blank", "Relationship can't be blank"]
+
+    NotFoundError:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Connection not found"
+
+    AuthError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Missing authorization token"
+
+  responses:
+    UnauthorizedError:
+      description: Authentication information is missing or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError' 

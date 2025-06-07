@@ -13,6 +13,7 @@
 
 ## Database & Models
 - Always add database constraints for data integrity
+- add null: false whenever model say validates presence: true
 - Use proper ActiveRecord validations
 - Add database indexes for frequently queried columns
 - Use meaningful migration names with timestamps
@@ -23,6 +24,8 @@
 - Use RSpec as the testing framework
 - Follow the AAA pattern (Arrange, Act, Assert)
 - Use FactoryBot for test data creation
+- Use Faker for creating data in factories
+- Data should be realistic
 - Mock external API calls in tests
 - Aim for high test coverage but focus on meaningful tests
 - Write request specs for API endpoints

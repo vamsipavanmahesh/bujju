@@ -1,7 +1,10 @@
 module Api
   module V1
     class AuthController < ApplicationController
+      include JwtAuthenticatable
+
       skip_before_action :verify_authenticity_token
+      skip_before_action :authenticate_user!, only: [ :google_sign_in ]
 
       def google_sign_in
         # Validate token presence
@@ -132,7 +135,7 @@ module Api
           user_id: user.id,
           email: user.email, # Include email for easier debugging/logging
           iat: Time.current.to_i, # Issued at time
-          exp: 24.hours.from_now.to_i # Expiration time
+          exp: 2.years.from_now.to_i # Expiration time
         }
 
         JWT.encode(payload, ENV["JWT_SECRET_KEY"], "HS256")

@@ -1,4 +1,7 @@
 class User < ApplicationRecord
+  # Associations
+  has_many :connections, dependent: :destroy
+
   # Validations
   validates :email, presence: true, uniqueness: true
   validates :name, presence: true
@@ -17,5 +20,11 @@ class User < ApplicationRecord
 
     user.save!
     user
+  end
+
+  # Simple active method - all users are active by default
+  # Can be enhanced later with an active column if needed
+  def active?
+    true
   end
 end
